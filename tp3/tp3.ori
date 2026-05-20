@@ -1,0 +1,33 @@
+---
+# Playbook pour configurer un serveur web
+- name: Installation Apache 
+  hosts: all 
+  remote_user: root 
+ 
+  vars:
+    document_root: "/var/www/html"
+
+
+  tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+    
+    - name: Print the package facts
+      ansible.builtin.debug:
+        var: ansible_facts.packages
+    
+    - name: Installer apache2
+      apt:
+        update_cache: yes
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apache2
+        - mysql-server 
+    
+    - name: Check whether a package called apche2 is installed and copy the content 
+      copy:
+        content: "<h1>Bienvenue sur le serveur web</h1>"
+        dest: "{{ document_root }}/index.html" 
+      when: "'apache2' in ansible_facts.packages"
