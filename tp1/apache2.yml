@@ -1,0 +1,12 @@
+---
+# Playbook pour configurer un serveur web
+- name: Installation Apache 
+  hosts: all 
+  remote_user: root 
+
+  tasks:
+    - name: Installer apache2
+      apt:
+        update_cache: yes
+        name: apache2
+        state: absent
