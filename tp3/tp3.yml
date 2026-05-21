@@ -3,7 +3,8 @@
 - name: Installation Apache 
   hosts: all 
   remote_user: root 
- 
+  gather_facts: yes  # Required to collect ansible_* facts 
+  
   vars:
     document_root: "/var/www/html"
 
@@ -13,18 +14,28 @@
       ansible.builtin.package_facts:
         manager: auto
     
-    - name: Print the package facts
-      ansible.builtin.debug:
-        var: ansible_facts.packages
-    
+   # - name: Print the package facts
+   #   ansible.builtin.debug:
+   #    var: ansible_facts.packages
+
+
+    - name: Show default IPv4 address
+      debug:
+        msg: "The IP address of {{ inventory_hostname }} is {{ ansible_facts['ansible_default_ipv4'] }}"
+
+    - name: test
+      debug:
+        var: ansible_all_ipv4_addresses
+
     - name: Installer/desinstaller apache2 mysql 
       apt:
         update_cache: yes
         name: "{{ item }}"
-        state: absent
+        state: present
       loop:
         - apache2
         - mysql-server 
+      when: ansible_facts["ansible_default_ipv4.address"] == "10.0.0.104"   # ansible_default_ipv4.address 
     
     - name: Check whether a package called apche2 is installed and copy the content 
       copy:
